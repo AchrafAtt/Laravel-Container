@@ -1,0 +1,70 @@
+services:
+  app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - 9000:9000
+    depends_on:
+      - db
+    env_file:
+      - ./backend/.env
+    volumes:
+      - storage:/usr/share/nginx/html/storage:rw
+      - public:/usr/share/nginx/html/public:rw
+  queue-worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    command: php artisan queue:work
+    environment:
+      IS_WORKER: "true"
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - storage:/usr/share/nginx/html/storage:rw
+      - public:/usr/share/nginx/html/public:rw
+  nginx:
+    image: nginx:1-alpine
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./nginx.conf:/etc/nginx/templates/default.conf.template
+      - storage:/usr/share/nginx/html/storage:rw
+      - public:/usr/share/nginx/html/public:ro
+  db:
+    image: bitnami/postgresql:16.3.0
+    platform: linux/amd64
+    ports:
+      - 5432:5432
+    restart: always
+    volumes:
+      - db-data:/bitnami/postgresql
+    environment:
+      - POSTGRESQL_DATABASE=${POSTGRESQL_DATABASE}
+      - POSTGRESQL_USERNAME=${POSTGRESQL_USERNAME}
+      - POSTGRESQL_PASSWORD=${POSTGRESQL_PASSWORD}
+  redis:
+    image: bitnami/redis:7.2
+    platform: linux/amd64
+    ports:
+      - 6379:6379
+    restart: always
+    volumes:
+      - redis-data:/bitnami/redis/data
+    environment:
+      - ALLOW_EMPTY_PASSWORD=no
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
+
+volumes:
+  storage:
+  public:
+  db-data:
+  redis-data:
