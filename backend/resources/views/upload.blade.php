@@ -13,7 +13,7 @@
         <p class="text-red-500">{{ $errors->first() }}</p>
     @endif
 
-    <form action="/upload" method="POST" enctype="multipart/form-data">
+    <form action="api/upload" method="POST" enctype="multipart/form-data">
         @csrf
         <label for="file">Choose a file:</label>
         <input type="file" name="file" id="file" required>
