@@ -1,8 +1,25 @@
 <?php
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\AutController;
+use App\Http\Controllers\Auth\AuthController;
+
 Route::get('/auth', function() {
     return response()->json(['message' => 'Authentication route is working.']);     
 });
 
-Route::post('/login', [AutController::class, 'login'])->name('login');
+Route::post('/auth/login', [AuthController::class, 'login']);
+
+Route::middleware('jwt.auth')->group(function () {
+    Route::post('/auth/logout', [AuthController::class, 'logout']);
+    Route::get('/auth/user', [AuthController::class, 'getUser']);
+});
+// Route::post('/login', [AutController::class, 'login'])->name('login');
+
+// Route::group(['prefix' => 'auth'], function () {
+//     Route::post('/login', [AuthController::class, 'login']);
+    
+//     Route::group(['middleware' => 'auth:api'], function () {
+//         Route::post('logout', [AuthController::class, 'logout']);
+//         Route::get('user', [AuthController::class, 'getUser']);
+//         // Other protected routes
+//     });
+// });
