@@ -30,6 +30,8 @@ class UserService extends CrudService
             $data['password'] = Hash::make($data['password']);
         }
         
+        //email_verified_at is set now
+        $data['email_verified_at'] = now();
         // Return the user model directly from parent::store
         return parent::store($data);
 
