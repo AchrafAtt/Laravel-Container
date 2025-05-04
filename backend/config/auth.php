@@ -67,6 +67,7 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\User::class),
+            'username' => 'email_pro', // Specify the email field for authentication
         ],
 
         // 'users' => [
