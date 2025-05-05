@@ -61,4 +61,16 @@ class UserService extends CrudService
         
       return $model;
     }
+
+    //index check if user is admin or not
+    public function index()
+    {
+        // Check if the user is an admin
+        if (auth()->user()->hasRole('admin')) {
+            return $this->model::query();
+        } else {
+            // If not an admin, return only the authenticated user's data
+            return $this->model::query()->where('id', auth()->user()->id);
+        }
+    }
 }

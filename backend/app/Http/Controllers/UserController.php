@@ -68,4 +68,11 @@ class UserController extends Controller
         }
     }
 
+    //profile
+    public function profile(Request $request): JsonResponse
+    {
+        $user = $this->userService->show($request->user()->id)->firstOrFail();
+        return response()->json($user);
+    }
+
 }
