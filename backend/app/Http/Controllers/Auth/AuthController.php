@@ -17,15 +17,15 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'email' => 'required|email',
+            'email_pro' => 'required|email',
             'password' => 'required|string|min:8',
         ]);
 
-        $credentials = $request->only('email', 'password');
+        $credentials = $request->only('email_pro', 'password');
 
         try {
             if (! $token = JWTAuth::attempt($credentials)) {
-                return response()->json(['error' => 'Invalid credentials'], 401);
+                return response()->json(['error' => 'Invalid credentials '], 401);
             }
 
             // Get the authenticated user.
