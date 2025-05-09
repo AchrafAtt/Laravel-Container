@@ -1,39 +1,33 @@
 <?php
-use App\Http\Controllers\PasswordResetController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Mail\Message;
 
 
-Route::get('/auth', function() {
-    return response()->json(['message' => 'Authentication route is working.']);     
-});
-
-Route::post('/auth/login', [AuthController::class, 'login']);
-
-Route::middleware('jwt.auth')->group(function () {
-    Route::post('/auth/logout', [AuthController::class, 'logout']);
-    Route::get('/auth/user', [AuthController::class, 'getUser']);
-
-});
-
-
-//resset password
-
-// Password Reset Routes
-Route::post('password/email', [PasswordResetController::class, 'sendResetLinkEmail']);
-Route::post('password/reset', [PasswordResetController::class, 'reset']);
-Route::get('password/reset/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
-
-
-
-
-Route::get('/test-mail', function () {
-    Mail::raw('Test email at ' . now(), function (Message $message) {
-        $message->to('test@gmail.com')
-                ->subject('Test Email');
+// Group all auth routes under /auth prefix
+Route::prefix('auth')->group(function () {
+    // Public routes
+    Route::get('/', function() {
+        return response()->json(['message' => 'Authentication route is working.']);
+    })->name('auth.check');
+    
+    Route::post('/login', [AuthController::class, 'login'])
+        ->middleware('throttle:5,1') // Rate limit: 5 attempts per minute
+        ->name('auth.login');
+    
+    // Password reset routes
+    Route::middleware('throttle:3,1')->group(function () { // Rate limit: 3 attempts per minute
+        Route::post('/forgot-password', [ForgotPasswordController::class, 'forgotPassword'])
+            ->name('auth.forgot-password');
+        Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'])
+            ->name('auth.reset-password');
     });
     
-    return 'Mail sent!';
+    // Protected routes
+    Route::middleware('jwt.auth')->group(function () {
+        Route::post('/logout', [AuthController::class, 'logout'])
+            ->name('auth.logout');
+        Route::get('/user', [AuthController::class, 'getUser'])
+            ->name('auth.user');
+    });
 });
