@@ -17,9 +17,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        User::factory(10)->create();
 
-        //add user with email specific
+        // add user with email specific
         User::factory()->create([
             'first_name' => 'achraf',
             'last_name' => 'fcb',
@@ -56,7 +56,8 @@ class DatabaseSeeder extends Seeder
         // $adminRole->givePermissionTo($createUserPermission);
 
         // // Make sure the user exists before assigning a role
-        // $user = User::find(2);
+        // $user = User::first();
+        
         // $user->assignRole('admin');
     }
 }
